@@ -130,9 +130,9 @@
         </div>
       </div>
       <nav class="mobile-dock" aria-label="Kugelsteuerung für Smartphones">
-        <button type="button" id="mobileStartBtn" class="btn btn-primary" aria-label="500 Kugeln starten">
+        <button type="button" id="mobileStartBtn" class="btn btn-primary" aria-label="10 Kugeln starten">
           <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
-          <span id="mobileStartText">500 starten</span>
+          <span id="mobileStartText">10 starten</span>
         </button>
         <button type="button" id="mobileSingleBtn" class="btn" aria-label="Eine Kugel starten">+1</button>
         <button type="button" id="mobilePauseBtn" class="btn dock-icon" aria-label="Animation pausieren" disabled>⏸</button>
@@ -163,15 +163,15 @@
       </div>
       <div class="divider"></div>
       <div class="field launch-field">
-        <div class="fieldhead"><label for="ballsRange">Kugeln je Durchlauf</label><span class="value" id="ballsValue">500</span></div>
-        <input class="range" id="ballsRange" type="range" min="10" max="5000" step="10" value="500">
+        <div class="fieldhead"><label for="ballsRange">Kugeln je Durchlauf</label><span class="value" id="ballsValue">10</span></div>
+        <input class="range" id="ballsRange" type="range" min="10" max="5000" step="10" value="10">
         <div class="inline-options" style="margin-top:9px" role="group" aria-label="Kugelanzahl wählen">
-          <button class="chip" data-balls="100">100</button><button class="chip" data-balls="500">500</button><button class="chip" data-balls="2000">2.000</button><button class="chip" data-balls="5000">5.000</button>
+          <button class="chip active" data-balls="10">10</button><button class="chip" data-balls="20">20</button><button class="chip" data-balls="50">50</button><button class="chip" data-balls="100">100</button>
         </div>
       </div>
       <div class="actions">
         <button class="btn btn-primary full" id="startBtn" title="Gewählte Kugelanzahl animiert hinzufügen">
-          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="startText">500 Kugeln starten</span>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="startText">10 Kugeln starten</span>
         </button>
         <button class="btn" id="singleBtn">+ 1 Kugel</button>
         <button class="btn" id="pauseBtn">⏸ Pause</button>
@@ -188,7 +188,7 @@
   const bctx = board.getContext('2d');
   const fmt = (x, digits = 0) => Number(x).toLocaleString('de-DE', {minimumFractionDigits:digits,maximumFractionDigits:digits});
   const state = {
-    n:10, p:0.5, selected:500, speed:1,
+    n:10, p:0.5, selected:10, speed:1,
     counts:Array(11).fill(0), total:0, sumK:0,
     pending:0, active:[], running:false, spawnBalance:0,
     lastPath:null, showTheory:true, tilt:false, observedPs:new Set(),
