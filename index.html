@@ -73,6 +73,33 @@
     /* Accessible fullscreen exit button, only visible in fullscreen. */
     .exit-fullscreen-btn{display:none;position:absolute;top:12px;right:12px;z-index:12;min-height:38px;padding:8px 12px;font-size:12px;background:#f8f1e6;color:#47321e}
     .board-card:fullscreen .exit-fullscreen-btn{display:inline-flex}
+
+    /* Mobile: the simulator's actions remain reachable while watching the board. */
+    .mobile-dock{display:none}
+    @media(max-width:760px){
+      .shell{padding-bottom:calc(95px + env(safe-area-inset-bottom,0px))}
+      .mobile-dock{
+        position:fixed;z-index:100;left:0;right:0;bottom:0;
+        display:grid;grid-template-columns:minmax(0,1fr) 49px 49px 45px;
+        align-items:center;gap:7px;
+        padding:9px max(10px,env(safe-area-inset-right,0px))
+          calc(9px + env(safe-area-inset-bottom,0px))
+          max(10px,env(safe-area-inset-left,0px));
+        background:rgba(250,244,233,.97);border-top:1px solid #bda17e;
+        box-shadow:0 -5px 24px rgba(66,42,20,.18);
+        -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+      }
+      .mobile-dock .btn{min-width:0;min-height:46px;height:46px;border-radius:10px;
+        padding:5px 3px;font-size:13px;white-space:nowrap;touch-action:manipulation}
+      .mobile-dock .btn-primary{gap:5px}
+      .mobile-dock .btn-primary svg{width:14px;height:14px}
+      .mobile-dock .dock-icon{font-size:20px;line-height:1}
+      .mobile-dock .dock-reset{color:#815244}
+    }
+    @media(max-width:360px){
+      .mobile-dock{grid-template-columns:minmax(0,1fr) 43px 43px 40px;gap:5px}
+      .mobile-dock .btn{font-size:12px}
+    }
   </style>
 </head>
 <body>
@@ -102,6 +129,15 @@
           <div id="lastPath" class="last-path">Noch keine Kugel angekommen.</div>
         </div>
       </div>
+      <nav class="mobile-dock" aria-label="Kugelsteuerung für Smartphones">
+        <button type="button" id="mobileStartBtn" class="btn btn-primary" aria-label="500 Kugeln starten">
+          <svg aria-hidden="true" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          <span id="mobileStartText">500 starten</span>
+        </button>
+        <button type="button" id="mobileSingleBtn" class="btn" aria-label="Eine Kugel starten">+1</button>
+        <button type="button" id="mobilePauseBtn" class="btn dock-icon" aria-label="Animation pausieren" disabled>⏸</button>
+        <button type="button" id="mobileResetBtn" class="btn btn-quiet dock-icon dock-reset" aria-label="Alle Kugeln zurücksetzen">↺</button>
+      </nav>
     </section>
     <aside class="card controls" aria-label="Einstellungen">
       <div class="field">
@@ -394,9 +430,14 @@
     $('startBtn').disabled=false;
     $('startText').textContent=fmt(state.selected)+(state.speed===Infinity?' Kugeln sofort hinzufügen':' Kugeln starten');
     $('startBtn').title='Bei jedem Klick weitere '+fmt(state.selected)+' Kugeln hinzufügen';
+    $('mobileStartText').textContent=fmt(state.selected)+(state.speed===Infinity?' sofort':' starten');
+    $('mobileStartBtn').setAttribute('aria-label','Weitere '+fmt(state.selected)+' Kugeln '+(state.speed===Infinity?'sofort hinzufügen':'starten'));
     $('boardProgress').textContent=fmt(state.total)+(state.total===1?' Kugel angekommen':' Kugeln angekommen');
     $('pauseBtn').textContent=state.running?'⏸ Pause':'▶ Fortsetzen';
     $('pauseBtn').disabled=!busy;
+    $('mobilePauseBtn').textContent=state.running?'⏸':'▶';
+    $('mobilePauseBtn').disabled=!busy;
+    $('mobilePauseBtn').setAttribute('aria-label',state.running?'Animation pausieren':'Animation fortsetzen');
     if(state.lastPath){const dirs=state.lastPath.choices.map(x=>x?'R':'L').join(' · ');$('lastPath').textContent=`${dirs} → Fach ${state.lastPath.k}`}
     else $('lastPath').textContent='Noch keine Kugel angekommen.';
     for(const el of document.querySelectorAll('[data-balls]'))el.classList.toggle('active',Number(el.dataset.balls)===state.selected)
@@ -423,6 +464,11 @@
   $('singleBtn').addEventListener('click',()=>enqueue(1));
   $('pauseBtn').addEventListener('click',()=>{if(state.running)state.running=false;else if(state.pending||state.active.length)state.running=true;updateUI()});
   $('resetBtn').addEventListener('click',reset);
+  // Both control locations invoke the same underlying simulation actions.
+  $('mobileStartBtn').addEventListener('click',()=>$('startBtn').click());
+  $('mobileSingleBtn').addEventListener('click',()=>$('singleBtn').click());
+  $('mobilePauseBtn').addEventListener('click',()=>$('pauseBtn').click());
+  $('mobileResetBtn').addEventListener('click',()=>$('resetBtn').click());
   $('fullscreenBtn').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('boardCard').requestFullscreen()}catch(e){console.warn('Vollbild in diesem Browser nicht verfügbar',e)}});
   $('exitFullscreenBtn').addEventListener('click',async()=>{if(document.fullscreenElement)await document.exitFullscreen()});
   document.addEventListener('keydown',e=>{
