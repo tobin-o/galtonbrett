@@ -18,7 +18,35 @@
     .bottom-card{margin-top:18px;padding-bottom:10px}.chart-top{display:flex;gap:18px;flex-wrap:wrap;align-items:center}.legend{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:#b9c9e0}.swatch{width:13px;height:9px;border-radius:3px;background:var(--teal)}.line-swatch{width:17px;height:0;border-top:3px solid var(--violet);position:relative}.line-swatch:after{position:absolute;content:"";width:6px;height:6px;background:var(--violet);border-radius:50%;top:-5px;left:5px}
     .chart-wrap{position:relative;padding:0 15px 12px}.chart-wrap canvas{width:100%;height:275px;display:block;touch-action:pan-y}.chart-tooltip{position:absolute;pointer-events:none;background:#20334d;border:1px solid #50708e;color:#ecf8ff;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.6;z-index:4;box-shadow:0 8px 24px #0006;white-space:nowrap;display:none}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:4px 20px 14px}.stat{padding:14px 15px;background:#0c1728;border:1px solid #253750;border-radius:12px}.stat-label{display:block;font-size:11px;color:#9aaecb;margin-bottom:6px}.stat-value{font-size:clamp(17px,2vw,23px);font-weight:820;letter-spacing:-.035em;font-variant-numeric:tabular-nums}.stat-note{font-size:11px;color:#91a6c5;margin-top:3px}
     .explain{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin:18px 0 0;padding:19px 22px;border:1px solid #294153;background:#112334b3;border-radius:16px}.explain-title{margin:0 0 7px;font-size:13px;font-weight:800;color:#d5faf2}.explain p{margin:0;color:#afc2d8;font-size:12px;line-height:1.6}.math{white-space:nowrap;color:#d7ccff;font-size:clamp(13px,2vw,20px);font-family:Georgia,"Times New Roman",serif;font-style:italic}.foot{font-size:11px;color:#7e91ac;text-align:center;margin:20px auto 0;line-height:1.6}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
-    .board-card:fullscreen{background:#0a1322;border:none;border-radius:0;display:flex;flex-direction:column;padding:12px}.board-card:fullscreen .stage-wrap{flex:1;min-height:0}.board-card:fullscreen canvas{height:100%;min-height:0}.board-card:fullscreen .board-footer{padding-bottom:10px}
+    /* Fullscreen includes both the wooden board and the complete controls panel. */
+    .top-grid:fullscreen{
+      width:100%;height:100vh;height:100dvh;box-sizing:border-box;
+      display:grid;grid-template-columns:minmax(0,1fr) minmax(285px,350px);
+      gap:14px;padding:12px;overflow:hidden;
+      background:#e9dfcd;align-items:stretch;
+    }
+    .top-grid:fullscreen .board-card{min-width:0;min-height:0;overflow:hidden}
+    .top-grid:fullscreen .stage-wrap{flex:1;min-height:0}
+    .top-grid:fullscreen .stage-wrap canvas{height:100%!important;min-height:0!important}
+    .top-grid:fullscreen .board-footer{padding-bottom:10px}
+    .top-grid:fullscreen .controls{
+      min-width:0;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+    }
+    @media(max-width:760px){
+      .top-grid:fullscreen{
+        display:block;overflow-y:auto;overflow-x:hidden;
+        padding:8px 8px calc(92px + env(safe-area-inset-bottom,0px));
+        -webkit-overflow-scrolling:touch;
+      }
+      .top-grid:fullscreen .board-card{height:auto;min-height:0}
+      .top-grid:fullscreen .stage-wrap{flex:none}
+      .top-grid:fullscreen .stage-wrap canvas{
+        height:min(52dvh,460px)!important;min-height:300px!important;
+      }
+      .top-grid:fullscreen .controls{
+        margin-top:10px;max-height:none;overflow:visible;
+      }
+    }
     @media(max-width:1100px){.top-grid{grid-template-columns:minmax(0,1.45fr) minmax(260px,1fr)}.shell{width:min(100% - 32px,1000px)}.stage-wrap canvas{height:540px}.controls{padding:18px}.stage-wrap{margin:0 12px 10px}}
     @media(max-width:760px){.shell{width:calc(100% - 20px);padding:17px 0 26px}.header{align-items:flex-start;gap:12px}.header-actions .btn{padding:9px 11px;min-height:37px}.header-actions{justify-content:end}.header-actions .btn span{display:none}.header h1{font-size:28px}.header .subtitle{font-size:12px}.kicker{font-size:10px;letter-spacing:.1em}.top-grid{grid-template-columns:1fr}.stage-wrap canvas{height:490px}.card-head{padding:15px 16px 10px}.controls{padding:18px 18px 15px}.controls .intro{margin-bottom:16px}.stats-grid{grid-template-columns:repeat(2,1fr);padding:2px 12px 12px}.chart-wrap canvas{height:244px}.bottom-card{margin-top:12px}.explain{grid-template-columns:1fr;gap:10px;padding:16px}.math{font-size:17px}.head-title{font-size:14px}}
     @media(max-width:440px){.stage-wrap canvas{height:425px}.tag{font-size:10px;padding:6px 8px}.chart-top{gap:8px}.legend{font-size:10px}.stats-grid{gap:8px}.stat{padding:10px 11px}.stat-value{font-size:18px}.header-actions{gap:5px}}
@@ -72,7 +100,7 @@
     @media(max-width:440px){.board-footer{padding:6px 12px 13px;gap:7px}}
     /* Accessible fullscreen exit button, only visible in fullscreen. */
     .exit-fullscreen-btn{display:none;position:absolute;top:12px;right:12px;z-index:12;min-height:38px;padding:8px 12px;font-size:12px;background:#f8f1e6;color:#47321e}
-    .board-card:fullscreen .exit-fullscreen-btn{display:inline-flex}
+    .top-grid:fullscreen .exit-fullscreen-btn{display:inline-flex}
 
     /* Mobile: the simulator's actions remain reachable while watching the board. */
     .mobile-dock{display:none}
@@ -469,7 +497,7 @@
   $('mobileSingleBtn').addEventListener('click',()=>$('singleBtn').click());
   $('mobilePauseBtn').addEventListener('click',()=>$('pauseBtn').click());
   $('mobileResetBtn').addEventListener('click',()=>$('resetBtn').click());
-  $('fullscreenBtn').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('boardCard').requestFullscreen()}catch(e){console.warn('Vollbild in diesem Browser nicht verfügbar',e)}});
+  $('fullscreenBtn').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await document.querySelector('.top-grid').requestFullscreen()}catch(e){console.warn('Vollbild in diesem Browser nicht verfügbar',e)}});
   $('exitFullscreenBtn').addEventListener('click',async()=>{if(document.fullscreenElement)await document.exitFullscreen()});
   document.addEventListener('keydown',e=>{
     if(e.target.matches('input,button,textarea,select'))return;
