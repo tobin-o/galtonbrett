@@ -1,0 +1,441 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eee2cb">
+  <meta name="description" content="Interaktives Galtonbrett: Binomialverteilung durch unabhängige Bernoulli-Entscheidungen sichtbar machen.">
+  <title>Galtonbrett – Einführung in die Stochastik</title>
+  <style>
+    :root{color-scheme:dark;--bg:#090f1c;--panel:#101b2d;--panel2:#132139;--border:#263550;--text:#eef5ff;--muted:#9fafc7;--teal:#66e6ce;--violet:#b3a0ff;--amber:#ffc987;--red:#ff8b9a;--radius:20px}
+    *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at 17% -9%,#1b324a 0%,transparent 45%),radial-gradient(ellipse at 94% 25%,#241b43 0%,transparent 45%),var(--bg);font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--text);letter-spacing:.005em}button,input{font:inherit}button{cursor:pointer}button:focus-visible,input:focus-visible{outline:2px solid var(--teal);outline-offset:3px}.shell{width:min(1440px,calc(100% - 48px));margin:auto;padding:30px 0 54px}
+    .header{display:flex;align-items:center;justify-content:space-between;gap:24px;margin-bottom:25px}.kicker{display:flex;gap:9px;align-items:center;color:var(--teal);font-size:12px;letter-spacing:.17em;font-weight:800;text-transform:uppercase}.dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 14px var(--teal)}h1{margin:7px 0 5px;font-size:clamp(29px,3.2vw,45px);letter-spacing:-.04em;line-height:1.12}.subtitle{margin:0;color:var(--muted);font-size:14px;line-height:1.55}.header-actions{display:flex;gap:9px;flex-wrap:wrap;justify-content:flex-end}
+    .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--border);border-radius:12px;padding:12px 16px;min-height:44px;background:#172741;color:var(--text);font-size:13px;font-weight:750;transition:background .18s,transform .18s,border-color .18s;user-select:none}.btn:hover{background:#233754;border-color:#48607f}.btn:active{transform:scale(.98)}.btn svg{width:16px;height:16px;flex:none}.btn-primary{background:var(--teal);color:#071a22;border-color:var(--teal)}.btn-primary:hover{background:#9ff4e3;border-color:#9ff4e3}.btn-quiet{background:transparent}.btn-small{padding:9px 12px;min-height:37px;font-size:12px}.btn-danger{color:#ffc9d1}.btn[disabled]{opacity:.45;cursor:not-allowed}.top-grid{display:grid;grid-template-columns:minmax(0,1.9fr) minmax(280px,1fr);gap:18px;align-items:stretch}
+    .card{background:linear-gradient(145deg,rgba(19,33,54,.96),rgba(14,25,43,.96));border:1px solid var(--border);border-radius:var(--radius);box-shadow:0 15px 45px #0003;overflow:hidden}.card-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:20px 22px 12px}.head-title{font-weight:760;font-size:15px;letter-spacing:-.012em}.head-mini{color:var(--muted);font-size:12px}.tag{display:inline-flex;align-items:center;gap:7px;border:1px solid #31506a;background:#182d42;color:#9eeede;border-radius:100px;padding:7px 11px;font-size:11px;font-weight:700;white-space:nowrap}.tag-purple{border-color:#49416d;background:#27213c;color:#c2b4ff}
+    .board-card{min-width:0;position:relative;display:flex;flex-direction:column}.stage-wrap{position:relative;flex:1;min-height:0;margin:0 17px 10px;border-radius:14px;overflow:hidden;background:radial-gradient(ellipse at 50% 6%,rgba(40,70,107,.24),transparent 55%),#0c1728;border:1px solid #22344e}.stage-wrap canvas{display:block;width:100%;height:100%;min-height:clamp(430px,54vh,600px);touch-action:pan-y}.board-footer{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;padding:0 20px 18px;color:var(--muted);font-size:12px}.last-path{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;font-variant-numeric:tabular-nums}
+    .controls{padding:21px 21px 18px}.controls h2{font-size:15px;margin:0 0 4px}.controls .intro{font-size:12px;margin:0 0 22px;color:var(--muted);line-height:1.5}.field{margin-bottom:21px}.fieldhead{display:flex;justify-content:space-between;gap:10px;align-items:center;margin-bottom:11px}.fieldhead label{font-size:13px;font-weight:740}.value{font-size:14px;font-weight:850;color:var(--teal);font-variant-numeric:tabular-nums}.value-sub{font-size:11px;color:var(--muted);text-align:right}.range{appearance:none;-webkit-appearance:none;width:100%;height:6px;border-radius:100px;background:#293a56;cursor:pointer;margin:0;outline-offset:6px;accent-color:var(--teal)}.range::-webkit-slider-thumb{appearance:none;width:17px;height:17px;background:var(--teal);border:3px solid #13263c;border-radius:50%;box-shadow:0 0 0 1px #5bd8c3,0 0 12px #66e6ce44}.range::-moz-range-thumb{width:12px;height:12px;background:var(--teal);border:3px solid #13263c;border-radius:50%}.range-labels{display:flex;justify-content:space-between;color:#778ba8;font-size:10px;margin-top:8px}.inline-options{display:flex;gap:7px;flex-wrap:wrap}.chip{border:1px solid #324461;border-radius:8px;background:#172940;padding:7px 10px;font-size:11px;color:#c9d7ed;min-width:51px}.chip.active,.chip[aria-pressed="true"]{background:#294d52;border-color:#4faeab;color:#a6fff0}.pillseg{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px;background:#0c1729;padding:5px;border-radius:11px}.segbtn{min-height:35px;border:1px solid transparent;background:transparent;border-radius:8px;color:var(--muted);font-weight:750;font-size:12px}.segbtn[aria-pressed="true"]{background:#29445b;border-color:#3b6782;color:#e7faff}.switches{margin-top:16px;border-top:1px solid var(--border);padding-top:13px;display:grid;gap:10px}.switch{display:flex;justify-content:space-between;align-items:center;gap:14px;font-size:12px;color:#d7e4f6;cursor:pointer}.switch input{appearance:none;-webkit-appearance:none;width:35px;height:21px;background:#36435c;border:1px solid #65718a;border-radius:20px;position:relative;flex:none;cursor:pointer}.switch input::after{content:"";width:13px;height:13px;position:absolute;top:3px;left:3px;border-radius:50%;background:#d8e4f4;transition:transform .18s}.switch input:checked{background:#2e9c8b;border-color:#58ccb6}.switch input:checked::after{transform:translateX(14px);background:#fff}.switch .hint{display:block;color:var(--muted);font-size:10px;margin-top:3px;font-weight:400}.tip{font-size:11px;line-height:1.5;color:#93a8c2;margin:13px 0 0}.divider{height:1px;background:var(--border);margin:18px 0}
+    .actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}.actions .full{grid-column:span 2}.actions .btn{padding:12px 10px}
+    .bottom-card{margin-top:18px;padding-bottom:10px}.chart-top{display:flex;gap:18px;flex-wrap:wrap;align-items:center}.legend{display:inline-flex;align-items:center;gap:7px;font-size:11px;color:#b9c9e0}.swatch{width:13px;height:9px;border-radius:3px;background:var(--teal)}.line-swatch{width:17px;height:0;border-top:3px solid var(--violet);position:relative}.line-swatch:after{position:absolute;content:"";width:6px;height:6px;background:var(--violet);border-radius:50%;top:-5px;left:5px}
+    .chart-wrap{position:relative;padding:0 15px 12px}.chart-wrap canvas{width:100%;height:275px;display:block;touch-action:pan-y}.chart-tooltip{position:absolute;pointer-events:none;background:#20334d;border:1px solid #50708e;color:#ecf8ff;padding:9px 11px;border-radius:10px;font-size:12px;line-height:1.6;z-index:4;box-shadow:0 8px 24px #0006;white-space:nowrap;display:none}.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:4px 20px 14px}.stat{padding:14px 15px;background:#0c1728;border:1px solid #253750;border-radius:12px}.stat-label{display:block;font-size:11px;color:#9aaecb;margin-bottom:6px}.stat-value{font-size:clamp(17px,2vw,23px);font-weight:820;letter-spacing:-.035em;font-variant-numeric:tabular-nums}.stat-note{font-size:11px;color:#91a6c5;margin-top:3px}
+    .explain{display:grid;grid-template-columns:1fr auto;gap:20px;align-items:center;margin:18px 0 0;padding:19px 22px;border:1px solid #294153;background:#112334b3;border-radius:16px}.explain-title{margin:0 0 7px;font-size:13px;font-weight:800;color:#d5faf2}.explain p{margin:0;color:#afc2d8;font-size:12px;line-height:1.6}.math{white-space:nowrap;color:#d7ccff;font-size:clamp(13px,2vw,20px);font-family:Georgia,"Times New Roman",serif;font-style:italic}.foot{font-size:11px;color:#7e91ac;text-align:center;margin:20px auto 0;line-height:1.6}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+    .board-card:fullscreen{background:#0a1322;border:none;border-radius:0;display:flex;flex-direction:column;padding:12px}.board-card:fullscreen .stage-wrap{flex:1;min-height:0}.board-card:fullscreen canvas{height:100%;min-height:0}.board-card:fullscreen .board-footer{padding-bottom:10px}
+    @media(max-width:1100px){.top-grid{grid-template-columns:minmax(0,1.45fr) minmax(260px,1fr)}.shell{width:min(100% - 32px,1000px)}.stage-wrap canvas{height:540px}.controls{padding:18px}.stage-wrap{margin:0 12px 10px}}
+    @media(max-width:760px){.shell{width:calc(100% - 20px);padding:17px 0 26px}.header{align-items:flex-start;gap:12px}.header-actions .btn{padding:9px 11px;min-height:37px}.header-actions{justify-content:end}.header-actions .btn span{display:none}.header h1{font-size:28px}.header .subtitle{font-size:12px}.kicker{font-size:10px;letter-spacing:.1em}.top-grid{grid-template-columns:1fr}.stage-wrap canvas{height:490px}.card-head{padding:15px 16px 10px}.controls{padding:18px 18px 15px}.controls .intro{margin-bottom:16px}.stats-grid{grid-template-columns:repeat(2,1fr);padding:2px 12px 12px}.chart-wrap canvas{height:244px}.bottom-card{margin-top:12px}.explain{grid-template-columns:1fr;gap:10px;padding:16px}.math{font-size:17px}.head-title{font-size:14px}}
+    @media(max-width:440px){.stage-wrap canvas{height:425px}.tag{font-size:10px;padding:6px 8px}.chart-top{gap:8px}.legend{font-size:10px}.stats-grid{gap:8px}.stat{padding:10px 11px}.stat-value{font-size:18px}.header-actions{gap:5px}}
+    @media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important}}
+
+    /* Warm wood-style redesign */
+    :root{color-scheme:light;--bg:#efe4d1;--panel:#f8f1e6;--panel2:#efe2cd;--border:#ccb08a;--text:#3f2d1d;--muted:#786552;--teal:#8c6840;--violet:#7d915d;--amber:#c28b49;--red:#9a5c4f}
+    body{background:radial-gradient(circle at 14% 0%,#fbf2e1 0%,transparent 38%),radial-gradient(circle at 95% 18%,#ead7b6 0%,transparent 30%),linear-gradient(180deg,#f4ebdd 0%,#eadcc8 100%);color:var(--text)}
+    .card{background:linear-gradient(180deg,#fbf5eb 0%,#f0e3cf 100%);border:1px solid #ccb08a;box-shadow:0 10px 26px rgba(87,58,29,.10)}
+    .stage-wrap{background:linear-gradient(180deg,#c6945a 0%,#b07d45 45%,#996737 100%);border:1px solid #8b5d33;box-shadow:inset 0 1px 0 rgba(255,244,228,.6), inset 0 0 0 4px rgba(120,79,39,.14)}
+    .board-card:fullscreen{background:#e8d6bd}
+    .btn{background:#efe2cf;color:#432f1f;border-color:#c4a47c}
+    .btn:hover{background:#ead8be;border-color:#af8a5d}.btn-quiet{background:rgba(255,248,239,.55)}
+    .btn-primary{background:#8c6840;color:#fff;border-color:#8c6840}.btn-primary:hover{background:#9b7449;border-color:#9b7449}
+    .btn-danger{color:#8c4d43}
+    .tag{border-color:#b79265;background:#efe0c7;color:#5e4124}.tag-purple{border-color:#98a57a;background:#e8eddc;color:#5b6f40}
+    .head-mini,.subtitle,.tip,.stat-note,.stat-label,.board-footer,.foot,.value-sub,.range-labels,.controls .intro{color:#786552}
+    .head-title,h1,.controls h2,.explain-title,.math,.stat-value,.value{color:#3e2d1d}
+    .value{color:#8c6840}.dot{background:#8c6840;box-shadow:none}
+    .range{background:#d5c0a2;accent-color:#8c6840}.range::-webkit-slider-thumb{background:#8c6840;border-color:#f8efdf;box-shadow:0 0 0 1px #8c6840,0 2px 8px rgba(80,48,17,.18)}.range::-moz-range-thumb{background:#8c6840;border-color:#f8efdf}
+    .chip{border-color:#c6aa84;background:#f5ecdf;color:#4d3926}.chip.active,.chip[aria-pressed="true"]{background:#e7dbc7;border-color:#8c6840;color:#5c4225}
+    .pillseg{background:#e7dac7}.segbtn{color:#6f5c49}.segbtn[aria-pressed="true"]{background:#f8f1e7;border-color:#b6956d;color:#4d3821}
+    .switch input{background:#d9c7ae;border-color:#bca07d}.switch input::after{background:#fffaf2}.switch input:checked{background:#9f815e;border-color:#9f815e}
+    .stat,.explain{background:#f8f1e6;border-color:#ccb08a;color:#6c5947}
+    .swatch{background:#b78a51}.line-swatch{border-top-color:#6f8550}.line-swatch:after{background:#6f8550}.chart-tooltip{background:#fbf5eb;border-color:#b99872;color:#473321}
+    .kicker{display:none}
+    /* Authentic wooden cabinet and readable counters */
+    .stage-wrap{border:8px solid #93643d;border-radius:15px;box-shadow:0 0 0 2px #654629,inset 0 0 0 3px #e1b67f,0 10px 20px rgba(75,45,23,.16)}
+    
+    
+    .switch{color:#59412c}.legend{color:#59412c}.explain p{color:#68523d}
+    .mixed-note{margin:4px 21px 8px;padding:9px 12px;border-left:3px solid #986b32;background:#efe1c7;border-radius:4px;color:#61472b;font-size:12px;line-height:1.5}
+    .mixed-note[hidden]{display:none!important}
+    .board-card .stage-wrap{margin-top:17px}
+    .controls .intro{line-height:1.55}
+    .launch-field{margin-bottom:17px}.launch-field .inline-options{gap:6px}
+    .pillseg .segbtn{padding:6px 2px;font-size:11px;min-width:0}
+    @media(max-width:440px){.mixed-note{margin-left:13px;margin-right:13px}.pillseg .segbtn{font-size:10px}.stage-wrap{margin-top:12px}}
+    
+    /* Strong contrast for both datasets against the wooden cabinet. */
+    .swatch{background:#2777a3}
+    .line-swatch{border-top-color:#a33c35}
+    .line-swatch:after{background:#a33c35}
+
+    /* Compact area below the collecting compartments. */
+    .board-footer{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px;padding:5px 15px 15px;text-align:center;color:#614a35}
+    .board-progress{font-size:13px;font-weight:750;font-variant-numeric:tabular-nums;color:#583f27}
+    .last-path-block{display:flex;flex-direction:column;gap:4px;max-width:100%;align-items:center}
+    .last-path-heading{font-size:12px;font-weight:750;color:#72563a}
+    .last-path{white-space:normal;overflow:visible;text-overflow:clip;font-size:12px;line-height:1.5;max-width:100%;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+    @media(max-width:440px){.board-footer{padding:6px 12px 13px;gap:7px}}
+    /* Accessible fullscreen exit button, only visible in fullscreen. */
+    .exit-fullscreen-btn{display:none;position:absolute;top:12px;right:12px;z-index:12;min-height:38px;padding:8px 12px;font-size:12px;background:#f8f1e6;color:#47321e}
+    .board-card:fullscreen .exit-fullscreen-btn{display:inline-flex}
+  </style>
+</head>
+<body>
+<main class="shell">
+  <header class="header">
+    <div>
+            <h1>Das Galtonbrett</h1>
+      <p class="subtitle">Einführung in die Stochastik · Wintersemester 2026/27</p>
+    </div>
+    <div class="header-actions">
+      <button id="fullscreenBtn" class="btn btn-quiet" title="Galtonbrett im Vollbild anzeigen" aria-label="Galtonbrett im Vollbild anzeigen">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3M3 16v3a2 2 0 0 0 2 2h3m8 0h3a2 2 0 0 0 2-2v-3"/></svg>
+        <span>Vollbild</span>
+      </button>
+    </div>
+  </header>
+  <div class="top-grid">
+    <section class="card board-card" id="boardCard" aria-label="Animiertes Galtonbrett">
+      <button type="button" id="exitFullscreenBtn" class="btn exit-fullscreen-btn" aria-label="Vollbild beenden">Vollbild beenden</button>
+      <div class="stage-wrap" id="stageWrap">
+        <canvas id="boardCanvas" role="img" aria-label="Galtonbrett mit animierten Kugeln, Hindernissen und Auffangfächern"></canvas>
+      </div>
+      <div class="board-footer">
+        <div id="boardProgress" class="board-progress">0 Kugeln angekommen</div>
+        <div class="last-path-block">
+          <div class="last-path-heading">Letzte Kugel:</div>
+          <div id="lastPath" class="last-path">Noch keine Kugel angekommen.</div>
+        </div>
+      </div>
+    </section>
+    <aside class="card controls" aria-label="Einstellungen">
+      <div class="field">
+        <div class="fieldhead"><label for="rowsRange">Anzahl der Reihen <em>n</em></label><span class="value" id="rowsValue">10</span></div>
+        <input class="range" id="rowsRange" type="range" min="2" max="20" step="1" value="10">
+      </div>
+      <div class="field">
+        <div class="fieldhead"><label for="pRange">Wahrscheinlichkeit rechts <em>p</em></label><span class="value" id="pValue">0,50</span></div>
+        <input class="range" id="pRange" type="range" min="0" max="1" step="0.01" value="0.5">
+      </div>
+      <div class="field" style="margin-bottom:0">
+        <div class="fieldhead"><label>Animationsgeschwindigkeit</label></div>
+        <div class="pillseg" role="group" aria-label="Animationsgeschwindigkeit">
+          <button class="segbtn" data-speed="0.55" aria-pressed="false">Langsam</button>
+          <button class="segbtn" data-speed="1" aria-pressed="true">Normal</button>
+          <button class="segbtn" data-speed="4" aria-pressed="false">Schnell</button>
+          <button class="segbtn" data-speed="instant" aria-pressed="false">Sofort</button>
+        </div>
+      </div>
+      <div class="switches">
+        <label class="switch"><span>Theoretische Verteilung einblenden <small class="hint">Rote Markierungen in den Fächern</small></span><input type="checkbox" id="theoryToggle" checked></label>
+        <label class="switch"><span>Neigung symbolisch darstellen <small class="hint">Optischer Effekt, keine Stoßphysik</small></span><input type="checkbox" id="tiltToggle"></label>
+      </div>
+      <div class="divider"></div>
+      <div class="field launch-field">
+        <div class="fieldhead"><label for="ballsRange">Kugeln je Durchlauf</label><span class="value" id="ballsValue">500</span></div>
+        <input class="range" id="ballsRange" type="range" min="10" max="5000" step="10" value="500">
+        <div class="inline-options" style="margin-top:9px" role="group" aria-label="Kugelanzahl wählen">
+          <button class="chip" data-balls="100">100</button><button class="chip" data-balls="500">500</button><button class="chip" data-balls="2000">2.000</button><button class="chip" data-balls="5000">5.000</button>
+        </div>
+      </div>
+      <div class="actions">
+        <button class="btn btn-primary full" id="startBtn" title="Gewählte Kugelanzahl animiert hinzufügen">
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg><span id="startText">500 Kugeln starten</span>
+        </button>
+        <button class="btn" id="singleBtn">+ 1 Kugel</button>
+        <button class="btn" id="pauseBtn">⏸ Pause</button>
+        <button class="btn btn-quiet btn-danger" id="resetBtn">↺ Zurücksetzen</button>
+      </div>
+    </aside>
+  </div>
+</main>
+<script>
+(() => {
+  'use strict';
+  const $ = id => document.getElementById(id);
+  const board = $('boardCanvas');
+  const bctx = board.getContext('2d');
+  const fmt = (x, digits = 0) => Number(x).toLocaleString('de-DE', {minimumFractionDigits:digits,maximumFractionDigits:digits});
+  const state = {
+    n:10, p:0.5, selected:500, speed:1,
+    counts:Array(11).fill(0), total:0, sumK:0,
+    pending:0, active:[], running:false, spawnBalance:0,
+    lastPath:null, showTheory:true, tilt:false, observedPs:new Set(),
+    lastFrame:performance.now(), lastUi:0
+  };
+  let bw=0,bh=0,bdpr=1;
+  const clamp=(v,a,b)=>Math.min(b,Math.max(a,v));
+
+  function binomialProbs(){
+    const out=[];
+    for(let k=0;k<=state.n;k++){
+      let comb=1;
+      for(let j=1;j<=k;j++)comb*= (state.n-j+1)/j;
+      out.push(comb*Math.pow(state.p,k)*Math.pow(1-state.p,state.n-k));
+    }
+    return out;
+  }
+  function sampleChoices(){const choices=[];let k=0;for(let i=0;i<state.n;i++){const right=Math.random()<state.p;choices.push(right?1:0);k+=right?1:0}return {choices,k}}
+  function reset(){
+    state.counts=Array(state.n+1).fill(0);state.total=0;state.sumK=0;
+    state.pending=0;state.active=[];state.spawnBalance=0;state.running=false;
+    state.lastPath=null;state.observedPs.clear();updateUI();drawBoard();
+  }
+  function enqueue(q){
+    // Every click adds another batch, even while an earlier batch is running.
+    if(state.speed===Infinity){addInstant(q);return}
+    const wasEmpty=state.pending===0 && state.active.length===0;
+    if(wasEmpty)state.spawnBalance=0;
+    state.pending+=q;
+    state.running=true;
+    // First click starts visibly at once; following clicks extend the queue.
+    if(wasEmpty && state.pending>0 && state.active.length<230){
+      state.pending--;
+      spawnBall();
+    }
+    updateUI();
+    drawBoard();
+  }
+  function addInstant(q){
+    let last=null;
+    for(let i=0;i<q;i++){
+      let k=0;
+      const lastChoices=i===q-1?[]:null;
+      for(let j=0;j<state.n;j++){
+        const right=Math.random()<state.p;
+        if(right)k++;
+        if(lastChoices)lastChoices.push(right?1:0);
+      }
+      state.counts[k]++;state.sumK+=k;
+      if(lastChoices)last={choices:lastChoices,k};
+    }
+    if(q>0){state.observedPs.add(state.p);state.lastPath=last}
+    state.total+=q;
+    updateUI();drawBoard();
+  }
+  function drawRoundRect(ctx,x,y,w,h,r,fill){if(!Number.isFinite(w)||!Number.isFinite(h)||w<=0||h<=0)return;ctx.beginPath();ctx.roundRect(x,y,w,h,Math.max(0,Math.min(r,w/2,h/2)));ctx.fillStyle=fill;ctx.fill()}
+  function configureCanvas(c,ctx){
+    const rect=c.getBoundingClientRect();const dpr=Math.min(window.devicePixelRatio||1,2);
+    c.width=Math.max(1,Math.round(rect.width*dpr));c.height=Math.max(1,Math.round(rect.height*dpr));
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return [rect.width,rect.height,dpr]
+  }
+  function resize(){[bw,bh,bdpr]=configureCanvas(board,bctx)}
+  function geometry(){
+    const dx=Math.min(35,(bw-72)/(state.n+1));
+    const dy=Math.min(35,(bh-255)/Math.max(1,state.n));
+    const firstY=65+Math.max(0,(bh-280-state.n*dy)*0.35);
+    const floorY=bh-31;
+    const binsTop=firstY+state.n*dy+18;
+    return {dx,dy,cx:bw/2,firstY,floorY,binsTop,pegRadius:clamp(dx*.105,1.8,3.45)}
+  }
+  function xAt(g,row,rights){return g.cx+(rights-row/2)*g.dx}
+  function ballCoords(ball,g){
+    const t=ball.progress;
+    const startY=g.firstY-42;
+    if(t<1){const q=clamp(t,0,1);return {x:g.cx,y:startY+(g.firstY-startY)*(q*q*(3-2*q))}}
+    const seg=t-1;
+    if(seg<state.n){
+      const i=Math.floor(seg),u=seg-i,so=ball.prefix[i],end=ball.prefix[i+1];
+      const sx=xAt(g,i,so),ex=xAt(g,i+1,end),dir=ball.choices[i]?1:-1;
+      const sy=g.firstY+i*g.dy;
+      // A peg nudges the marble sideways: gently curved departure, always falling.
+      // The subtle horizontal deflection is visual; Bernoulli draws remain exact.
+      const bend=1-Math.pow(1-u,2.1);
+      const recoil=Math.sin(Math.PI*u)*Math.exp(-2.4*u)*g.dx*0.035;
+      const x=sx+(ex-sx)*bend+dir*recoil;
+      // Slow very briefly at contact, then accelerate downwards. No upward hop.
+      const y=sy+g.dy*(u-0.045*Math.sin(2*Math.PI*u));
+      return {x,y};
+    }
+    const u=clamp(seg-state.n,0,1);
+    return {x:xAt(g,state.n,ball.k),y:g.firstY+state.n*g.dy+(g.floorY-g.firstY-state.n*g.dy-8)*u*u*(3-2*u)};
+  }
+  function spawnBall(){
+    const sample=sampleChoices();let k=0;const prefix=[0];
+    for(const dir of sample.choices){k+=dir;prefix.push(k)}
+    state.active.push({choices:sample.choices,prefix,k,p:state.p,progress:0,radius:clamp((bw-72)/(state.n+1)*.18,3.2,6)});
+  }
+  function finishBall(ball){
+    state.counts[ball.k]++;state.total++;state.sumK+=ball.k;
+    state.lastPath={choices:ball.choices,k:ball.k};state.observedPs.add(ball.p);
+  }
+  function flushAnimation(){
+    // Already animated balls keep the Bernoulli choices drawn at their release.
+    for(const ball of state.active)finishBall(ball);
+    const remaining=state.pending;
+    state.active=[];state.pending=0;state.spawnBalance=0;state.running=false;
+    if(remaining>0)addInstant(remaining);
+    else {updateUI()}
+  }
+  function step(dt){
+    if(!state.running)return;
+    if(state.speed===Infinity){flushAnimation();return}
+    const multiplier=state.speed;
+    state.spawnBalance+=dt*40*multiplier;
+    let count=Math.min(state.pending,Math.floor(state.spawnBalance),Math.max(0,230-state.active.length));
+    if(count>0){state.spawnBalance-=count;state.pending-=count;for(let i=0;i<count;i++)spawnBall()}
+    if(state.active.length>=230)state.spawnBalance=Math.min(state.spawnBalance,5);
+    const segmentDelta=dt*3.25*multiplier;
+    for(let i=state.active.length-1;i>=0;i--){
+      const b=state.active[i];b.progress+=segmentDelta;
+      if(b.progress>=state.n+2){finishBall(b);state.active.splice(i,1)}
+    }
+    if(state.pending===0&&state.active.length===0){
+      state.running=false;state.spawnBalance=0;
+    }
+  }
+  function rotated(ctx){if(!state.tilt)return;const angle=(state.p-.5)*.105;ctx.translate(bw/2,bh/2);ctx.rotate(angle);ctx.translate(-bw/2,-bh/2)}
+  function woodGrain(ctx){
+    // Deterministic translucent woodgrain (not a bitmap or an external asset).
+    ctx.save();ctx.lineWidth=1;
+    for(let i=0;i<52;i++){
+      const y0=i*16-18;
+      ctx.beginPath();
+      for(let x=-12;x<bw+18;x+=15){
+        const y=y0+3.2*Math.sin(x/79+i*.72)+1.6*Math.sin(x/25+i*.33);
+        if(x===-12)ctx.moveTo(x,y);else ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=i%4===0?'rgba(255,233,191,.10)':'rgba(91,51,24,.075)';ctx.stroke();
+    }
+    // Wooden frame rebate and four discreet brass screw heads.
+    ctx.strokeStyle='rgba(69,42,24,.28)';ctx.lineWidth=2;ctx.strokeRect(6,6,bw-12,bh-12);
+    for(const [x,y] of [[13,15],[bw-13,15],[13,bh-15],[bw-13,bh-15]]){
+      ctx.beginPath();ctx.arc(x,y,3.8,0,Math.PI*2);ctx.fillStyle='#bca178';ctx.fill();
+      ctx.strokeStyle='#765a39';ctx.lineWidth=.85;ctx.beginPath();ctx.moveTo(x-2,y+1);ctx.lineTo(x+2,y-1);ctx.stroke();
+    }
+    ctx.restore();
+  }
+  function drawBoard(){
+    if(!bw||!bh)return;
+    const ctx=bctx;ctx.setTransform(bdpr,0,0,bdpr,0,0);ctx.clearRect(0,0,bw,bh);
+    const grad=ctx.createLinearGradient(0,0,bw,bh);grad.addColorStop(0,'#d6b07a');grad.addColorStop(.6,'#ba8852');grad.addColorStop(1,'#9f6d3a');ctx.fillStyle=grad;ctx.fillRect(0,0,bw,bh);woodGrain(ctx);
+    ctx.save();rotated(ctx);const g=geometry();
+    ctx.strokeStyle='rgba(107,73,36,.08)';ctx.lineWidth=1;
+    for(let x=8;x<bw;x+=28){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,bh);ctx.stroke()}
+    for(let y=10;y<bh;y+=28){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(bw,y);ctx.stroke()}
+    const left=xAt(g,state.n,0)-g.dx*.49,right=xAt(g,state.n,state.n)+g.dx*.49;
+    const binHeight=Math.max(45,g.floorY-g.binsTop);
+    const theory=binomialProbs();
+    // The bars always depict relative frequencies on the fixed scale [0, 1].
+    // In particular, when the first ball arrives, its bar fills its compartment.
+    for(let k=0;k<=state.n;k++){
+      const cx=xAt(g,state.n,k),x=cx-g.dx*.47,w=g.dx*.94,number=state.counts[k];
+      drawRoundRect(ctx,x,g.binsTop,w,binHeight,4,'rgba(255,247,235,.32)');
+      if(number>0){
+        const proportion=number/state.total;
+        const height=Math.max(1,proportion*binHeight);
+        const y=g.floorY-height;
+        const bg=ctx.createLinearGradient(0,y,0,g.floorY);
+        bg.addColorStop(0,'#3c91be');bg.addColorStop(.48,'#236c97');bg.addColorStop(1,'#13486d');
+        drawRoundRect(ctx,x+1,y,w-2,height,Math.min(2,height/2),bg);
+        ctx.fillStyle='rgba(188,231,249,.8)';ctx.fillRect(x+2,y,Math.max(0,w-4),Math.min(2,height));
+      }
+      // Fixed count labels: a single marble always displays “1” in its bin.
+      if(number>0){
+        const numberText=number>=1000?(number/1000).toFixed(number<10000?1:0).replace('.',',')+'k':String(number);
+        const tiny=g.dx<20;
+        const labelFont=tiny?8:10;
+        const labelWidth=Math.min(w-1,Math.max(12,numberText.length*(tiny?4.2:5.6)+6));
+        drawRoundRect(ctx,cx-labelWidth/2,g.binsTop+5,labelWidth,17,4,'rgba(251,237,208,.95)');
+        ctx.font=`bold ${labelFont}px system-ui`;ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillStyle='#4f351d';ctx.fillText(numberText,cx,g.binsTop+13.6);ctx.textBaseline='alphabetic';
+      }
+    }
+    // Theoretical probability markers use exactly the same [0, 1] scale.
+    if(state.showTheory){
+      ctx.save();ctx.strokeStyle='#a33c35';ctx.lineWidth=2.5;ctx.setLineDash([4,3]);
+      for(let k=0;k<=state.n;k++){
+        const cx=xAt(g,state.n,k);
+        const y=g.floorY-theory[k]*binHeight;
+        ctx.beginPath();ctx.moveTo(cx-g.dx*.37,y);ctx.lineTo(cx+g.dx*.37,y);ctx.stroke();
+      }
+      ctx.setLineDash([]);ctx.restore();
+    }
+    ctx.strokeStyle='rgba(108,77,42,.62)';ctx.lineWidth=1.6;
+    for(let k=0;k<=state.n+1;k++){
+      const x=left+k*g.dx;ctx.beginPath();ctx.moveTo(x,g.binsTop);ctx.lineTo(x,g.floorY+1);ctx.stroke()
+    }
+    ctx.strokeStyle='#714d29';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(left-3,g.floorY+2);ctx.lineTo(right+3,g.floorY+2);ctx.stroke();
+    ctx.font=`${clamp(g.dx*.34,8.5,11)}px system-ui`;ctx.textAlign='center';ctx.fillStyle='#533a21';
+    for(let k=0;k<=state.n;k++)ctx.fillText(String(k),xAt(g,state.n,k),g.floorY+19);
+
+    // Faint edges illustrate the branching structure without simulating forces.
+    if(state.n<=14){ctx.strokeStyle='rgba(100,72,40,.13)';ctx.lineWidth=.85;
+      for(let r=0;r<state.n;r++)for(let j=0;j<=r;j++){
+        const sx=xAt(g,r,j),sy=g.firstY+r*g.dy;
+        for(const v of [0,1]){ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(xAt(g,r+1,j+v),sy+g.dy);ctx.stroke()}
+      }
+    }
+    for(let r=0;r<state.n;r++)for(let j=0;j<=r;j++){
+      const x=xAt(g,r,j),y=g.firstY+r*g.dy;
+      ctx.beginPath();ctx.arc(x+.55,y+.85,g.pegRadius+.25,0,Math.PI*2);ctx.fillStyle='rgba(48,39,29,.28)';ctx.fill();
+      const metal=ctx.createRadialGradient(x-g.pegRadius*.38,y-g.pegRadius*.38,.1,x,y,g.pegRadius);
+      metal.addColorStop(0,'#fcffff');metal.addColorStop(.43,'#cbd1d4');metal.addColorStop(.79,'#929ba0');metal.addColorStop(1,'#626c71');
+      ctx.beginPath();ctx.arc(x,y,g.pegRadius,0,Math.PI*2);ctx.fillStyle=metal;ctx.fill();
+      ctx.strokeStyle='rgba(65,71,74,.65)';ctx.lineWidth=.45;ctx.stroke();
+    }
+    // Entry point and direction hint.
+    ctx.strokeStyle='rgba(88,62,34,.48)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(g.cx,g.firstY-45);ctx.lineTo(g.cx,g.firstY-16);ctx.stroke();
+    ctx.beginPath();ctx.moveTo(g.cx-4,g.firstY-20);ctx.lineTo(g.cx,g.firstY-14);ctx.lineTo(g.cx+4,g.firstY-20);ctx.stroke();
+    // Animated markers follow their pre-sampled Bernoulli path.
+    for(const ball of state.active){
+      const pos=ballCoords(ball,g),radius=ball.radius;
+      if(pos.y<0||pos.y>bh+10)continue;
+      const col='#2575a1'; // All falling balls have the same distinct blue colour.
+      ctx.save();ctx.translate(pos.x,pos.y);
+      ctx.fillStyle='rgba(54,36,24,.22)';ctx.beginPath();ctx.ellipse(.9,1.7,radius*1.07,radius*.95,0,0,2*Math.PI);ctx.fill();
+      ctx.fillStyle=col;ctx.beginPath();ctx.arc(0,0,radius,0,2*Math.PI);ctx.fill();
+      ctx.beginPath();ctx.arc(-radius*.29,-radius*.35,radius*.27,0,2*Math.PI);ctx.fillStyle='#d8f4ff';ctx.fill();
+      ctx.restore()
+    }
+    ctx.restore();
+  }
+  function updateUI(){
+    $('rowsValue').textContent=state.n;
+    $('ballsValue').textContent=fmt(state.selected);
+    $('pValue').textContent=fmt(state.p,2);
+    const busy=state.active.length+state.pending>0;
+    $('startBtn').disabled=false;
+    $('startText').textContent=fmt(state.selected)+(state.speed===Infinity?' Kugeln sofort hinzufügen':' Kugeln starten');
+    $('startBtn').title='Bei jedem Klick weitere '+fmt(state.selected)+' Kugeln hinzufügen';
+    $('boardProgress').textContent=fmt(state.total)+(state.total===1?' Kugel angekommen':' Kugeln angekommen');
+    $('pauseBtn').textContent=state.running?'⏸ Pause':'▶ Fortsetzen';
+    $('pauseBtn').disabled=!busy;
+    if(state.lastPath){const dirs=state.lastPath.choices.map(x=>x?'R':'L').join(' · ');$('lastPath').textContent=`${dirs} → Fach ${state.lastPath.k}`}
+    else $('lastPath').textContent='Noch keine Kugel angekommen.';
+    for(const el of document.querySelectorAll('[data-balls]'))el.classList.toggle('active',Number(el.dataset.balls)===state.selected)
+  }
+  function tick(time){
+    const dt=clamp((time-state.lastFrame)/1000,0,.06);state.lastFrame=time;
+    step(dt);drawBoard();
+    if(time-state.lastUi>95){updateUI();state.lastUi=time}
+    requestAnimationFrame(tick)
+  }
+  $('rowsRange').addEventListener('input',ev=>{state.n=Number(ev.target.value);reset()});
+  $('pRange').addEventListener('input',ev=>{state.p=Number(ev.target.value);updateUI()});
+  $('ballsRange').addEventListener('input',ev=>{state.selected=Number(ev.target.value);updateUI()});
+  for(const el of document.querySelectorAll('[data-balls]'))el.addEventListener('click',()=>{state.selected=Number(el.dataset.balls);$('ballsRange').value=state.selected;updateUI()});
+  for(const el of document.querySelectorAll('[data-speed]'))el.addEventListener('click',()=>{
+    state.speed=el.dataset.speed==='instant'?Infinity:Number(el.dataset.speed);
+    for(const x of document.querySelectorAll('[data-speed]'))x.setAttribute('aria-pressed',String(x===el));
+    if(state.speed===Infinity && (state.pending||state.active.length))flushAnimation();
+    updateUI();
+  });
+  $('theoryToggle').addEventListener('change',e=>{state.showTheory=e.target.checked;updateUI()});
+  $('tiltToggle').addEventListener('change',e=>{state.tilt=e.target.checked});
+  $('startBtn').addEventListener('click',()=>enqueue(state.selected));
+  $('singleBtn').addEventListener('click',()=>enqueue(1));
+  $('pauseBtn').addEventListener('click',()=>{if(state.running)state.running=false;else if(state.pending||state.active.length)state.running=true;updateUI()});
+  $('resetBtn').addEventListener('click',reset);
+  $('fullscreenBtn').addEventListener('click',async()=>{try{if(document.fullscreenElement)await document.exitFullscreen();else await $('boardCard').requestFullscreen()}catch(e){console.warn('Vollbild in diesem Browser nicht verfügbar',e)}});
+  $('exitFullscreenBtn').addEventListener('click',async()=>{if(document.fullscreenElement)await document.exitFullscreen()});
+  document.addEventListener('keydown',e=>{
+    if(e.target.matches('input,button,textarea,select'))return;
+    if(e.code==='Space'){e.preventDefault();if(state.running)state.running=false;else if(state.pending||state.active.length)state.running=true;updateUI()}
+    else if(e.key.toLowerCase()==='n')enqueue(1);
+    else if(e.key.toLowerCase()==='r')reset();
+  });
+  window.addEventListener('resize',resize);
+  if('ResizeObserver' in window){const observer=new ResizeObserver(resize);observer.observe(board)}
+  document.addEventListener('fullscreenchange',()=>{resize();$('fullscreenBtn').title=document.fullscreenElement?'Vollbild beenden':'Vollbild anzeigen'});
+  resize();updateUI();requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
